@@ -62,6 +62,8 @@ function createSudokuGrid() {
             input.setAttribute('type', 'text');
             input.setAttribute('maxlength', '1');
             input.addEventListener('input', validateInput);
+            input.addEventListener('focus', highlightRelatedCells);
+            input.addEventListener('blur', removeHighlight);
             if (initialValues[row][col] !== 0) {
                 input.value = initialValues[row][col];
                 input.setAttribute('readonly', 'readonly'); // Make predefined values readonly
@@ -212,15 +214,82 @@ function fillGrid(board) {
     }
 }
 
+// Function to handle number button clicks
+function handleNumberButtonClick(event) {
+    const number = event.target.textContent;
+    const selectedInput = document.querySelector('#sudoku-grid input:focus');
+    if (selectedInput && !selectedInput.readOnly) {
+        selectedInput.value = number;
+        validateInput({ target: selectedInput });
+    }
+}
+
+// Function to handle clear button click
+function handleClearButtonClick() {
+    const selectedInput = document.querySelector('#sudoku-grid input:focus');
+    if (selectedInput && !selectedInput.readOnly) {
+        selectedInput.value = '';
+        validateInput({ target: selectedInput });
+    }
+}
+
+// Function to highlight related cells (row, column, 3x3 square, and input)
+function highlightRelatedCells(event) {
+    const input = event.target;
+    const row = input.parentElement.parentElement.rowIndex;
+    const col = input.parentElement.cellIndex;
+
+    // Highlight the row and column
+    for (let i = 0; i < 9; i++) {
+        document.querySelectorAll('#sudoku-grid tr')[row].querySelectorAll('input')[i].classList.add('highlight');
+        document.querySelectorAll('#sudoku-grid tr')[i].querySelectorAll('input')[col].classList.add('highlight');
+    }
+
+    // Highlight the 3x3 square
+    const startRow = Math.floor(row / 3) * 3;
+    const startCol = Math.floor(col / 3) * 3;
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+            document.querySelectorAll('#sudoku-grid tr')[startRow + i].querySelectorAll('input')[startCol + j].classList.add('highlight');
+        }
+    }
+
+    // Highlight the input itself
+    input.classList.add('highlighted-input');
+}
+
+// Function to remove highlight from related cells and input
+function removeHighlight(event) {
+    document.querySelectorAll('.highlight').forEach(cell => {
+        cell.classList.remove('highlight');
+    });
+    document.querySelectorAll('.highlighted-input').forEach(cell => {
+        cell.classList.remove('highlighted-input');
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     createSudokuGrid();
-    
+
+    // Add click event listeners to number buttons
+    const numberButtons = document.querySelectorAll('.number-button');
+    numberButtons.forEach(button => {
+        button.addEventListener('click', handleNumberButtonClick);
+    });
+
+    // Add click event listener to clear button
+    document.getElementById('clear-button').addEventListener('click', handleClearButtonClick);
+
     document.getElementById('solve-button').addEventListener('click', () => {
         const board = getBoard();
         if (solveSudoku(board)) {
             fillGrid(board);
         } else {
-            alert('No solution exists');
+            alert('No solution found!');
         }
+    });
+
+    document.getElementById('refresh-button').addEventListener('click', () => {
+        createSudokuGrid();
     });
 });
