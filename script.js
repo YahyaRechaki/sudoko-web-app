@@ -59,7 +59,7 @@ function createSudokuGrid() {
         for (let col = 0; col < 9; col++) {
             const td = document.createElement('td');
             const input = document.createElement('input');
-            input.setAttribute('type', 'text');
+            input.setAttribute('type', 'number');
             input.setAttribute('maxlength', '1');
             input.addEventListener('input', validateInput);
             input.addEventListener('focus', highlightRelatedCells);
@@ -79,8 +79,10 @@ function createSudokuGrid() {
 function validateInput(event) {
     const value = event.target.value;
     const input = event.target;
+    console.log('input', input, 'value', value);
     const row = input.parentElement.parentElement.rowIndex;
     const col = input.parentElement.cellIndex;
+    console.log('row', row, 'col', col);
 
     if (!/^[1-9]$/.test(value) && value !== '') {
         event.target.value = '';
@@ -90,7 +92,7 @@ function validateInput(event) {
     // Re-validate the entire grid to clear any previous invalid states
     revalidateGrid();
 
-    if (value !== '') {
+    if (value !== '' && value !== 0) {
         // Highlight invalid cells
         for (let i = 0; i < 9; i++) {
             // Check row and column
@@ -112,6 +114,12 @@ function validateInput(event) {
                     return;
                 }
             }
+        }
+
+        // Check if the entered number is correct or not depending on the solved board
+        const solvedBoard = solveSudoku(getBoard());
+        if(!solvedBoard) {
+            input.classList.add('invalid');
         }
     }
 }
@@ -214,26 +222,7 @@ function fillGrid(board) {
     }
 }
 
-// Function to handle number button clicks
-function handleNumberButtonClick(event) {
-    const number = event.target.textContent;
-    const selectedInput = document.querySelector('#sudoku-grid input:focus');
-    if (selectedInput && !selectedInput.readOnly) {
-        selectedInput.value = number;
-        validateInput({ target: selectedInput });
-    }
-}
-
-// Function to handle clear button click
-function handleClearButtonClick() {
-    const selectedInput = document.querySelector('#sudoku-grid input:focus');
-    if (selectedInput && !selectedInput.readOnly) {
-        selectedInput.value = '';
-        validateInput({ target: selectedInput });
-    }
-}
-
-// Function to highlight related cells (row, column, 3x3 square, and input)
+// Function to highlight related cells (row, column, and 3x3 square)
 function highlightRelatedCells(event) {
     const input = event.target;
     const row = input.parentElement.parentElement.rowIndex;
@@ -255,34 +244,24 @@ function highlightRelatedCells(event) {
     }
 
     // Highlight the input itself
-    input.classList.add('highlighted-input');
+    input.classList.add('highlight');
 }
 
-// Function to remove highlight from related cells and input
+// Function to remove highlight from related cells
 function removeHighlight(event) {
     document.querySelectorAll('.highlight').forEach(cell => {
         cell.classList.remove('highlight');
-    });
-    document.querySelectorAll('.highlighted-input').forEach(cell => {
-        cell.classList.remove('highlighted-input');
     });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     createSudokuGrid();
-
-    // Add click event listeners to number buttons
-    const numberButtons = document.querySelectorAll('.number-button');
-    numberButtons.forEach(button => {
-        button.addEventListener('click', handleNumberButtonClick);
-    });
-
-    // Add click event listener to clear button
-    document.getElementById('clear-button').addEventListener('click', handleClearButtonClick);
-
+    const solvedBoard = solveSudoku(getBoard());
+    console.log("solvedBoard : ", solvedBoard)
     document.getElementById('solve-button').addEventListener('click', () => {
         const board = getBoard();
         if (solveSudoku(board)) {
+            console.log('Solved board:', board);
             fillGrid(board);
         } else {
             alert('No solution found!');

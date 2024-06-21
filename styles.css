@@ -2,12 +2,12 @@
 body {
     font-family: Arial, sans-serif;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
     background-color: #f7f7f7;
-    box-sizing: border-box;
 }
 
 #sudoku-container {
@@ -53,19 +53,29 @@ body {
 #sudoku-grid tr:nth-child(3n+1) td {
     border-top: 2px solid black;
 }
-
-#solve-button {
+#control-buttons button {
+    margin: 10px;
     padding: 10px 20px;
     font-size: 16px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
     cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
 }
 
+#control-buttons button:hover {
+    background-color: #45a049;
+}
+
+/* 
 button {
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
     margin: 5px;
-}
+} */
 
 .highlight {
     background-color: #f3f8fd;
@@ -77,8 +87,55 @@ button {
 }
 
 .invalid {
+    border: 5px solid red;
     background-color: red;
     outline: none;
+}
+
+/* main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+} */
+
+.false-input {
+    color: red;
+}
+a:link {
+    text-decoration: none;
+}
+
+a:visited {
+    text-decoration: none;
+}
+
+a:active {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+.contact {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    margin-top: 20px;
+    
+}
+
+footer {
+    margin-top: 10%;
+    text-align: center;
+    width: 100%;
+    padding: 10px 0;
+    background-color: #dee6ee;
+    color: black;
+    font-weight: bold;
 }
 
 /* media queries */
